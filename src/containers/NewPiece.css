@@ -1,0 +1,8 @@
+.NewPiece form {
+  padding-bottom: 15px;
+}
+
+.NewPiece form textarea {
+  height: 300px;
+  font-size: 24px;
+}
