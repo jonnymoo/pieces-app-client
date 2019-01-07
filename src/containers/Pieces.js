@@ -2,40 +2,28 @@ import React, { Component } from "react";
 import { API, Storage } from "aws-amplify";
 import { FormGroup, FormControl, ControlLabel } from "react-bootstrap";
 import LoaderButton from "../components/LoaderButton";
-import config from "../config";
 import "./Pieces.css";
-import { s3Upload } from "../libs/awsLib";
 
 export default class Pieces extends Component {
   constructor(props) {
     super(props);
 
-    this.file = null;
-
     this.state = {
       isLoading: null,
       isDeleting: null,
       piece: null,
-      content: "",
-      attachmentURL: null
+      content: ""
     };
   }
 
   async componentDidMount() {
     try {
-      let attachmentURL;
       const piece = await this.getPiece();
-
-      const { content, attachment } = piece;
-
-      if (attachment) {
-        attachmentURL = await Storage.vault.get(attachment);
-      }
+      const { content } = piece;
 
       this.setState({
         piece,
-        content,
-        attachmentURL
+        content
       });
     } catch (e) {
       alert(e);
@@ -50,18 +38,10 @@ export default class Pieces extends Component {
     return this.state.content.length > 0;
   }
 
-  formatFilename(str) {
-    return str.replace(/^\w+-/, "");
-  }
-
   handleChange = event => {
     this.setState({
       [event.target.id]: event.target.value
     });
-  };
-
-  handleFileChange = event => {
-    this.file = event.target.files[0];
   };
 
   savePiece(piece) {
@@ -71,27 +51,13 @@ export default class Pieces extends Component {
   }
 
   handleSubmit = async event => {
-    let attachment;
     event.preventDefault();
-
-    if (this.file && this.file.size > config.MAX_ATTACHMENT_SIZE) {
-      alert(
-        `Please pick a file smaller than ${config.MAX_ATTACHMENT_SIZE /
-          1000000} MB.`
-      );
-      return;
-    }
 
     this.setState({ isLoading: true });
 
     try {
-      if (this.file) {
-        attachment = await s3Upload(this.file);
-      }
-
       await this.savePiece({
-        content: this.state.content,
-        attachment: attachment || this.state.piece.attachment
+        content: this.state.content
       });
       this.props.history.push("/");
     } catch (e) {
@@ -137,26 +103,6 @@ export default class Pieces extends Component {
                 value={this.state.content}
                 componentClass="textarea"
               />
-            </FormGroup>
-            {this.state.piece.attachment && (
-              <FormGroup>
-                <ControlLabel>Attachment</ControlLabel>
-                <FormControl.Static>
-                  <a
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    href={this.state.attachmentURL}
-                  >
-                    {this.formatFilename(this.state.piece.attachment)}
-                  </a>
-                </FormControl.Static>
-              </FormGroup>
-            )}
-            <FormGroup controlId="file">
-              {!this.state.piece.attachment && (
-                <ControlLabel>Attachment</ControlLabel>
-              )}
-              <FormControl onChange={this.handleFileChange} type="file" />
             </FormGroup>
             <LoaderButton
               block
