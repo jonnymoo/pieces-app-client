@@ -1,5 +1,10 @@
 import React, { Component } from "react";
-import { FormGroup, FormControl, ControlLabel } from "react-bootstrap";
+import {
+  HelpBlock,
+  FormGroup,
+  FormControl,
+  ControlLabel
+} from "react-bootstrap";
 import { Auth } from "aws-amplify";
 import LoaderButton from "../components/LoaderButton";
 import "./Signup.css";
@@ -13,12 +18,18 @@ export default class Signup extends Component {
       email: "",
       password: "",
       formMessage: { code: "", message: "" },
-      passwordVisible: false
+      passwordVisible: false,
+      confirmationCode: "",
+      newUser: null
     };
   }
 
   validateForm() {
     return this.state.email.length > 0 && this.state.password.length > 0;
+  }
+
+  validateConfirmationForm() {
+    return this.state.confirmationCode.length > 0;
   }
 
   handlePasswordVisibleDown = () => {
@@ -37,30 +48,22 @@ export default class Signup extends Component {
 
   handleSubmit = async event => {
     event.preventDefault();
-
-    this.setState({ isLoading: true });
+    this.setState({ isLoading: true, formMessage: { code: "", message: "" } });
 
     try {
-      await Auth.signUp({
+      const newUser = await Auth.signUp({
         username: this.state.email,
         password: this.state.password
       });
       this.setState({
-        formMessage: {
-          code: "signup",
-          message: "Please check your emails for a verification link"
-        }
+        newUser
       });
     } catch (e) {
       if (e.code === "UsernameExistsException") {
         try {
           await Auth.resendSignUp(this.state.email);
           this.setState({
-            formMessage: {
-              code: "resend",
-              message:
-                "Looks like you already tried signing up. We have resent you a verification link."
-            }
+            newUser: "resend"
           });
         } catch (e) {
           this.setState({ formMessage: e });
@@ -71,6 +74,25 @@ export default class Signup extends Component {
     }
 
     this.setState({ isLoading: false });
+  };
+
+  handleConfirmationSubmit = async event => {
+    event.preventDefault();
+
+    this.setState({ isLoading: true, formMessage: { code: "", message: "" } });
+
+    try {
+      await Auth.confirmSignUp(this.state.email, this.state.confirmationCode);
+      await Auth.signIn(this.state.email, this.state.password);
+      this.props.userHasAuthenticated(true);
+      this.props.history.push("/");
+    } catch (e) {
+      if (e.code === "NotAuthorizedException") {
+        this.props.history.push("/login");
+      } else {
+        this.setState({ formMessage: e, isLoading: false });
+      }
+    }
   };
 
   renderMessages() {
@@ -91,10 +113,36 @@ export default class Signup extends Component {
     return (
       <div className="Signup">
         {this.state.formMessage.code && this.renderMessages()}
-        {this.state.formMessage.code !== "signup" &&
-          this.state.formMessage.code !== "resend" &&
-          this.renderForm()}
+        {this.state.newUser === null
+          ? this.renderForm()
+          : this.renderConfirmationForm()}
       </div>
+    );
+  }
+
+  renderConfirmationForm() {
+    return (
+      <form onSubmit={this.handleConfirmationSubmit}>
+        <FormGroup controlId="confirmationCode" bsSize="large">
+          <ControlLabel>Confirmation Code</ControlLabel>
+          <FormControl
+            autoFocus
+            type="tel"
+            value={this.state.confirmationCode}
+            onChange={this.handleChange}
+          />
+          <HelpBlock>Please check your email for the code.</HelpBlock>
+        </FormGroup>
+        <LoaderButton
+          block
+          bsSize="large"
+          disabled={!this.validateConfirmationForm()}
+          type="submit"
+          isLoading={this.state.isLoading}
+          text="Verify"
+          loadingText="Verifying…"
+        />
+      </form>
     );
   }
 

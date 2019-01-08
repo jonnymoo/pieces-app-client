@@ -9,6 +9,7 @@ import UnauthenticatedRoute from "./components/UnauthenticatedRoute";
 import Signup from "./containers/Signup";
 import NewPiece from "./containers/NewPiece";
 import Pieces from "./containers/Pieces";
+import Settings from "./containers/Settings";
 
 export default ({ childProps }) => (
   <Switch>
@@ -23,6 +24,12 @@ export default ({ childProps }) => (
       path="/signup"
       exact
       component={Signup}
+      props={childProps}
+    />
+    <AuthenticatedRoute
+      path="/settings"
+      exact
+      component={Settings}
       props={childProps}
     />
     <AuthenticatedRoute
