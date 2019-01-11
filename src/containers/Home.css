@@ -3,7 +3,7 @@
   text-align: center;
 }
 
-.Home .lander h1 {
+.Home h1 {
   font-family: "Open Sans", sans-serif;
   font-weight: 600;
 }
@@ -19,6 +19,7 @@
   line-height: 1.5;
   white-space: nowrap;
   text-overflow: ellipsis;
+  position: relative;
 }
 .Home .pieces p {
   color: #666;
