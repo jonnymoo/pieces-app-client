@@ -8,6 +8,7 @@ import {
 import { Auth } from "aws-amplify";
 import LoaderButton from "../components/LoaderButton";
 import "./Signup.css";
+import PasswordControl from "../components/PasswordControl";
 
 export default class Signup extends Component {
   constructor(props) {
@@ -31,14 +32,6 @@ export default class Signup extends Component {
   validateConfirmationForm() {
     return this.state.confirmationCode.length > 0;
   }
-
-  handlePasswordVisibleDown = () => {
-    this.setState({ passwordVisible: true });
-  };
-
-  handlePasswordVisibleUp = () => {
-    this.setState({ passwordVisible: false });
-  };
 
   handleChange = event => {
     this.setState({
@@ -158,33 +151,12 @@ export default class Signup extends Component {
             onChange={this.handleChange}
           />
         </FormGroup>
-        <FormGroup controlId="password" bsSize="large">
-          <ControlLabel>Password</ControlLabel>
-          <div className="input-group">
-            <FormControl
-              value={this.state.password}
-              onChange={this.handleChange}
-              type={this.state.passwordVisible ? "text" : "password"}
-            />
-            <div
-              className="input-group-addon"
-              onMouseDown={this.handlePasswordVisibleDown}
-              onTouchStart={this.handlePasswordVisibleDown}
-              onMouseUp={this.handlePasswordVisibleUp}
-              onMouseOut={this.handlePasswordVisibleUp}
-              onTouchEnd={this.handlePasswordVisibleUp}
-            >
-              <span
-                className={
-                  this.state.passwordVisible
-                    ? "glyphicon glyphicon-eye-close"
-                    : "glyphicon glyphicon-eye-open"
-                }
-                aria-hidden="true"
-              />
-            </div>
-          </div>
-        </FormGroup>
+        <PasswordControl
+          controlId="password"
+          bsSize="large"
+          onChange={this.handleChange}
+          value={this.state.password}
+        />
         <LoaderButton
           block
           bsSize="large"

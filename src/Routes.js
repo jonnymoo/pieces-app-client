@@ -10,6 +10,8 @@ import Signup from "./containers/Signup";
 import NewPiece from "./containers/NewPiece";
 import Pieces from "./containers/Pieces";
 import Settings from "./containers/Settings";
+import ResetPassword from "./containers/ResetPassword";
+import ChangePassword from "./containers/ChangePassword";
 
 export default ({ childProps }) => (
   <Switch>
@@ -42,6 +44,18 @@ export default ({ childProps }) => (
       path="/pieces/:id"
       exact
       component={Pieces}
+      props={childProps}
+    />
+    <UnauthenticatedRoute
+      path="/login/reset"
+      exact
+      component={ResetPassword}
+      props={childProps}
+    />
+    <AuthenticatedRoute
+      path="/settings/password"
+      exact
+      component={ChangePassword}
       props={childProps}
     />
     {/* Finally, catch all unmatched routes */}

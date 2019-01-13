@@ -3,6 +3,8 @@ import { FormGroup, FormControl, ControlLabel } from "react-bootstrap";
 import LoaderButton from "../components/LoaderButton";
 import "./Login.css";
 import { Auth } from "aws-amplify";
+import { Link } from "react-router-dom";
+import PasswordControl from "../components/PasswordControl";
 
 export default class Login extends Component {
   constructor(props) {
@@ -52,14 +54,13 @@ export default class Login extends Component {
               onChange={this.handleChange}
             />
           </FormGroup>
-          <FormGroup controlId="password" bsSize="large">
-            <ControlLabel>Password</ControlLabel>
-            <FormControl
-              value={this.state.password}
-              onChange={this.handleChange}
-              type="password"
-            />
-          </FormGroup>
+          <PasswordControl
+            controlId="password"
+            bsSize="large"
+            onChange={this.handleChange}
+            value={this.state.password}
+          />
+          <Link to="/login/reset">Forgot password?</Link>
           <LoaderButton
             block
             bsSize="large"
