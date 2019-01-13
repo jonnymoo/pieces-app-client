@@ -23,7 +23,7 @@ const prod = {
   },
   apiGateway: {
     REGION: "us-east-1",
-    URL: "https://api.piecesnotes.com/prod"
+    URL: "https://api.piecenotes.com/prod"
   },
   cognito: {
     REGION: "us-east-1",
