@@ -4,7 +4,7 @@ import {
   ListGroup,
   ListGroupItem,
   Button,
-  Badge
+  ButtonGroup
 } from "react-bootstrap";
 import { LinkContainer } from "react-router-bootstrap";
 import { Link } from "react-router-dom";
@@ -47,7 +47,8 @@ export default class Home extends Component {
     API.post("pieces", `/practise/${pieceId}`, {});
     const updatedPieces = this.state.pieces.map(p => {
       if (p.pieceId === pieceId) {
-        p.practiseCount = p.practiseCount + 1;
+        p.practiseCount = p.practiseCount ? p.practiseCount + 1 : 1;
+        p.weekPractiseCount = p.weekPractiseCount ? p.weekPractiseCount + 1 : 1;
         p.lastPractisedAt = new Date().toUTCString();
       }
       return p;
@@ -55,44 +56,59 @@ export default class Home extends Component {
     this.setState({ updatedPieces });
   };
 
-  renderPiecesList(pieces) {
-    return [{}].concat(pieces).map((pieces, i) =>
-      i !== 0 ? (
-        <LinkContainer key={pieces.pieceId} to={`/pieces/${pieces.pieceId}`}>
-          <ListGroupItem>
-            <Badge>{pieces.practiseCount}</Badge>
-            <h4>{pieces.content.trim().split("\n")[0]}</h4>
+  handleNewPiece = () => {
+    this.props.history.push("/pieces/new");
+  };
 
-            {pieces.lastPractisedAt &&
-            isToday(new Date(pieces.lastPractisedAt)) ? (
-              <FontAwesomeIcon
-                onClick={event => event.preventDefault()}
-                size="5x"
-                color="green"
-                icon={faSmile}
-              />
-            ) : (
-              <Button
-                onClick={event => {
-                  event.preventDefault();
-                  this.handlePiecePractised(pieces.pieceId);
-                }}
-              >
-                <FontAwesomeIcon size="5x" color="yellow" icon={faSmile} />
-              </Button>
-            )}
-          </ListGroupItem>
-        </LinkContainer>
-      ) : (
-        <LinkContainer key="new" to="/pieces/new">
+  handleResetWeek = async () => {
+    API.post("pieces", `/resetWeek`, {});
+    const updatedPieces = this.state.pieces.map(p => {
+      p.weekPractiseCount = 0;
+      return p;
+    });
+    this.setState({ updatedPieces });
+  };
+
+  renderPiecesList(pieces) {
+    // For each piece
+    return pieces.map(piece => {
+      // Work out this weeks stamps - if not practised today then first one is a yellow clickable one
+      let thisWeeksStamps = [];
+      if (!piece.lastPractisedAt || !isToday(new Date(piece.lastPractisedAt))) {
+        thisWeeksStamps.push(
+          <FontAwesomeIcon
+            key="0"
+            onClick={event => {
+              event.preventDefault();
+              this.handlePiecePractised(piece.pieceId);
+            }}
+            size="5x"
+            color="yellow"
+            icon={faSmile}
+          />
+        );
+      }
+      // Rest are green ones
+      for (let i = 0; i < piece.weekPractiseCount; i++) {
+        thisWeeksStamps.push(
+          <FontAwesomeIcon key={i + 1} size="5x" color="green" icon={faSmile} />
+        );
+      }
+
+      // Return this list contianer - clickable through to edit the piece
+      return (
+        <LinkContainer key={piece.pieceId} to={`/pieces/${piece.pieceId}`}>
           <ListGroupItem>
-            <h4>
-              <b>{"\uFF0B"}</b> Create a new piece
-            </h4>
+            <span>
+              Practised {piece.practiseCount ? piece.practiseCount : 0} time
+              {piece.practiseCount > 0 && "s"}
+            </span>
+            <h4>{piece.content.trim().split("\n")[0]}</h4>
+            <div className="weeklyStamps">{thisWeeksStamps}</div>
           </ListGroupItem>
         </LinkContainer>
-      )
-    );
+      );
+    });
   }
 
   renderLander() {
@@ -115,7 +131,20 @@ export default class Home extends Component {
   renderPieces() {
     return (
       <div className="pieces">
-        <PageHeader>Your Pieces</PageHeader>
+        <ButtonGroup justified>
+          <Button
+            onClick={this.handleNewPiece}
+            bsStyle="primary"
+            bsSize="lg"
+            href="#"
+          >
+            Add new piece
+          </Button>
+          <Button onClick={this.handleResetWeek} bsSize="lg" href="#">
+            Clear stamps
+          </Button>
+        </ButtonGroup>
+        <br />
         <ListGroup>
           {!this.state.isLoading && this.renderPiecesList(this.state.pieces)}
         </ListGroup>

@@ -56,6 +56,7 @@ class App extends Component {
               </Navbar.Brand>
               <Navbar.Toggle />
             </Navbar.Header>
+            <Navbar.Text>A stamp a day</Navbar.Text>
             <Navbar.Collapse>
               <Nav pullRight>
                 {this.state.isAuthenticated ? (
