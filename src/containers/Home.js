@@ -100,8 +100,10 @@ export default class Home extends Component {
         <LinkContainer key={piece.pieceId} to={`/pieces/${piece.pieceId}`}>
           <ListGroupItem>
             <span>
-              Practised {piece.practiseCount ? piece.practiseCount : 0} time
-              {piece.practiseCount > 0 && "s"}
+              All time practises -{" "}
+              {piece.practiseCount && piece.practiseCount > 1
+                ? "" + piece.practiseCount + " times"
+                : "once"}
             </span>
             <h4>{piece.content.trim().split("\n")[0]}</h4>
             <div className="weeklyStamps">{thisWeeksStamps}</div>
