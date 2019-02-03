@@ -79,12 +79,16 @@ export default class Home extends Component {
   };
 
   handleResetWeek = async () => {
-    API.post("pieces", `/resetWeek`, {});
-    const updatedPieces = this.state.pieces.map(p => {
-      p.weekPractiseCount = 0;
-      return p;
-    });
-    this.setState({ updatedPieces });
+    if (window.confirm("This remove this weeks stamps - are you sure?")) {
+      // Reset
+
+      API.post("pieces", `/resetWeek`, {});
+      const updatedPieces = this.state.pieces.map(p => {
+        p.weekPractiseCount = 0;
+        return p;
+      });
+      this.setState({ updatedPieces });
+    }
   };
 
   renderPiecesList(pieces) {
