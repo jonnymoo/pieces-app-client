@@ -119,7 +119,7 @@ export default class Home extends Component {
           <ListGroupItem>
             <span>
               All time practises -{" "}
-              {piece.practiseCount && piece.practiseCount > 1
+              {piece.practiseCount === 0 || piece.practiseCount > 1
                 ? "" + piece.practiseCount + " times"
                 : "once"}
             </span>

@@ -19,6 +19,7 @@ export default class Pieces extends Component {
   async componentDidMount() {
     try {
       const piece = await this.getPiece();
+
       const { content } = piece;
 
       this.setState({
@@ -30,8 +31,12 @@ export default class Pieces extends Component {
     }
   }
 
-  getPiece() {
-    return API.get("pieces", `/pieces/${this.props.match.params.id}`).item;
+  async getPiece() {
+    const piece = await API.get(
+      "pieces",
+      `/pieces/${this.props.match.params.id}`
+    );
+    return piece.item;
   }
 
   validateForm() {
