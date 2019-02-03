@@ -20,28 +20,46 @@ export default class Home extends Component {
 
     this.state = {
       isLoading: true,
+      versionId: "0",
       pieces: []
     };
   }
 
   async componentDidMount() {
+    const component = this;
+
     if (!this.props.isAuthenticated) {
       return;
     }
 
+    await this.reload();
+
+    this.setState({ isLoading: false });
+
+    // If visibility changes to visible then reload the stamps (if been idle for more than an hour)
+    document.addEventListener("visibilitychange", async () => {
+      if (document.visibilityState === "visible") {
+        await component.reload();
+      }
+    });
+  }
+
+  reload = async () => {
     try {
-      const pieces = await this.pieces();
-      this.setState({ pieces });
+      const pieces = await API.get(
+        "pieces",
+        `/pieceslist/${this.state.versionId}`
+      );
+      if (pieces !== null) {
+        this.setState({
+          pieces: pieces.items,
+          versionId: pieces.versionId
+        });
+      }
     } catch (e) {
       alert(e);
     }
-
-    this.setState({ isLoading: false });
-  }
-
-  pieces() {
-    return API.get("pieces", "/pieces");
-  }
+  };
 
   handlePiecePractised = async pieceId => {
     API.post("pieces", `/practise/${pieceId}`, {});

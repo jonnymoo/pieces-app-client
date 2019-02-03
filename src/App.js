@@ -52,7 +52,11 @@ class App extends Component {
           <Navbar fluid collapseOnSelect>
             <Navbar.Header>
               <Navbar.Brand>
-                <Link to="/">PieceNotes</Link>
+                <Link to="/">
+                  {this.props.location.pathname === "/"
+                    ? "PieceNotes"
+                    : "CLOSE"}
+                </Link>
               </Navbar.Brand>
               <Navbar.Toggle />
             </Navbar.Header>

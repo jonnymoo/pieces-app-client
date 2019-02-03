@@ -31,7 +31,7 @@ export default class Pieces extends Component {
   }
 
   getPiece() {
-    return API.get("pieces", `/pieces/${this.props.match.params.id}`);
+    return API.get("pieces", `/pieces/${this.props.match.params.id}`).item;
   }
 
   validateForm() {
